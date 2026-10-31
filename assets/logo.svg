@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <defs>
+    <linearGradient id="primaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1B3A6B" />
+      <stop offset="100%" stop-color="#2563EB" />
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5C76B" />
+      <stop offset="100%" stop-color="#C9A84C" />
+    </linearGradient>
+    <filter id="shadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="2" stdDeviation="2" flood-color="#000000" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+  
+  <!-- Icon container -->
+  <g transform="translate(6, 6)" filter="url(#shadow)">
+    <!-- House outline with chart bars -->
+    <rect x="0" y="0" width="48" height="48" rx="12" fill="url(#primaryGrad)" />
+    <!-- Roof -->
+    <path d="M12 25 L24 14 L36 25" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- House base -->
+    <path d="M16 23.5 V35 C16 36.1 16.9 37 18 37 H30 C31.1 37 32 36.1 32 35 V23.5" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    <!-- Data chart bars inside house -->
+    <rect x="19" y="30" width="2.5" height="4" rx="0.75" fill="url(#goldGrad)" />
+    <rect x="23" y="26" width="2.5" height="8" rx="0.75" fill="url(#goldGrad)" />
+    <rect x="27" y="22" width="2.5" height="12" rx="0.75" fill="#FFFFFF" />
+    <!-- Chimney/Sensor dot -->
+    <circle cx="31" cy="17" r="1.5" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Typography -->
+  <text x="66" y="36" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-size="25" font-weight="800" fill="#1B3A6B" letter-spacing="-0.5">Immo<tspan fill="#2563EB">Data</tspan></text>
+  <text x="67" y="47" font-family="'Inter', -apple-system, BlinkMacSystemFont, sans-serif" font-size="9" font-weight="600" fill="#C9A84C" letter-spacing="1.5">FRANCE • ANALYTICS</text>
+</svg>

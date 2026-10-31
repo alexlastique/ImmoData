@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement Confirmé — ImmoData</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/payment.css">
+</head>
+<body style="background-color: #F8FAFC;">
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="Accueil ImmoData">
+        <img src="assets/logo.svg" alt="ImmoData Logo">
+      </a>
+      <div class="nav-actions">
+        <a href="index.html" class="btn btn-outline btn-sm">Nouvelle recherche</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Confirmation Card Main Container -->
+  <main class="confirmation-container">
+    <div class="success-card">
+      
+      <!-- Animated SVG Checkmark -->
+      <div class="checkmark-wrapper">
+        <svg viewBox="0 0 52 52" style="width: 100%; height: 100%;">
+          <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+          <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+      </div>
+
+      <h1 class="success-title">Paiement confirmé !</h1>
+      <p class="success-subtitle">
+        Votre demande d'expertise a été transmise avec succès à nos équipes.
+      </p>
+
+      <!-- Order Recap Box -->
+      <div class="order-recap-box">
+        <div class="recap-row">
+          <span class="recap-label">Numéro de dossier</span>
+          <span class="recap-value" id="recapRef">EXP-2024-84921</span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">Formule choisie</span>
+          <span class="recap-value" id="recapPlan">Avis d'Expert Standard</span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">Montant réglé</span>
+          <span class="recap-value" id="recapAmount">99,00 € TTC</span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">Adresse du bien</span>
+          <span class="recap-value" id="recapAddress">--</span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">E-mail de transmission</span>
+          <span class="recap-value" id="recapEmail">--</span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">Expert assigné</span>
+          <span class="recap-value" style="color: var(--navy); display: flex; align-items: center; gap: 0.35rem;">
+            <span>👩‍💼</span> Marie Dubois, Expert Immobilier Certifié FNAIM
+          </span>
+        </div>
+        <div class="recap-row">
+          <span class="recap-label">Délai garanti de livraison</span>
+          <span class="recap-value" id="recapDelay" style="color: var(--blue);">Disponible dans 3 jours</span>
+        </div>
+      </div>
+
+      <!-- PDF Download Section -->
+      <div class="pdf-download-section">
+        <div style="font-size: 2.25rem; margin-bottom: 0.5rem;">📄</div>
+        <h3 class="pdf-download-title">Rapport d'Expertise Pré-rempli Disponible</h3>
+        <p class="pdf-download-desc">
+          Votre rapport d'évaluation préliminaire avec l'analyse de marché DVF et l'estimation indicative a été généré automatiquement au format PDF haute résolution.
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+          <button type="button" id="downloadPdfBtn" class="btn btn-navy btn-lg">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            <span>Télécharger votre rapport (PDF)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Next Steps & Back Button -->
+      <div style="margin-top: 2rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 0.5rem;">Prochaines étapes :</h4>
+        <p style="font-size: 0.85rem; color: var(--gray-600); line-height: 1.6; margin-bottom: 1.5rem;">
+          Nos experts procèdent au croisement approfondi des données cadastrales, des autorisations d'urbanisme et de la visite sur pièces. Vous recevrez la version définitive signée directement par e-mail.
+        </p>
+        
+        <a href="index.html" class="btn btn-outline">
+          <span>← Retour à la recherche</span>
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Custom PDF Generation Script -->
+  <script src="js/pdf.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const savedData = JSON.parse(localStorage.getItem('immo_expert_data') || '{}');
+
+      // Random reference number
+      const randomRef = 'EXP-2024-' + Math.floor(10000 + Math.random() * 90000);
+      document.getElementById('recapRef').textContent = randomRef;
+
+      // Plan formatting
+      const rawPlan = urlParams.get('plan') || savedData.plan || 'standard';
+      let planDisplay = "Avis d'Expert Standard";
+      if (rawPlan.includes('urgent')) planDisplay = "Avis d'Expert Urgent Express (24h)";
+      else if (rawPlan.includes('eco')) planDisplay = "Avis d'Expert Économique (7 jours)";
+      document.getElementById('recapPlan').textContent = planDisplay;
+
+      // Amount formatting
+      const amount = urlParams.get('amount') || savedData.amount || '99';
+      document.getElementById('recapAmount').textContent = `${amount},00 € TTC`;
+
+      // Address
+      const address = urlParams.get('address') || savedData.address || localStorage.getItem('immo_last_query') || '8 rue de Londres, 75009 Paris';
+      document.getElementById('recapAddress').textContent = address;
+
+      // Email
+      const email = urlParams.get('email') || savedData.email || 'client@immodata.fr';
+      document.getElementById('recapEmail').textContent = email;
+
+      // Delay
+      let delayText = "Disponible dans 3 jours ouvrés";
+      if (rawPlan.includes('urgent')) delayText = "Garanti en moins de 24 heures";
+      else if (rawPlan.includes('eco')) delayText = "Disponible dans 7 jours";
+      document.getElementById('recapDelay').textContent = delayText;
+
+      // Wire download button
+      const downloadBtn = document.getElementById('downloadPdfBtn');
+      if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => {
+          if (typeof window.generateExpertReport === 'function') {
+            window.generateExpertReport({
+              reference: randomRef,
+              address: address,
+              plan: planDisplay,
+              amount: amount,
+              email: email,
+              delay: delayText,
+              type: savedData.type || 'Appartement',
+              surface: savedData.surface || '68',
+              rooms: savedData.rooms || '3',
+              condition: savedData.condition || 'Bon état'
+            });
+          } else {
+            alert('Génération du PDF en cours de chargement...');
+          }
+        });
+      }
+    });
+  </script>
+</body>
+</html>

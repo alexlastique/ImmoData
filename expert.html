@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demande d'Avis d'Expert Immobilier — ImmoData</title>
+  <meta name="description" content="Faites estimer précisément votre bien immobilier par un évaluateur certifié FNAIM / RICS. Rapport d'expertise officiel sous 24h à 7 jours.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .expert-hero {
+      background: linear-gradient(135deg, var(--navy-dark) 0%, var(--navy) 60%, #1E4985 100%);
+      color: var(--white);
+      padding: 3.5rem 0 4.5rem 0;
+      text-align: center;
+    }
+    .expert-hero h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+    }
+    .expert-hero p {
+      color: #DBEAFE;
+      font-size: 1.15rem;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+    .form-wrapper-card {
+      background-color: var(--white);
+      border-radius: var(--radius-lg);
+      padding: 2.5rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--gray-200);
+      margin-top: -2.5rem;
+      position: relative;
+      z-index: 10;
+    }
+    .form-section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1.5px solid var(--gray-100);
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .pricing-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .pricing-card.selected {
+      border: 2.5px solid var(--gold);
+      background-color: #FDFAF2;
+      box-shadow: 0 10px 25px rgba(201, 168, 76, 0.25);
+    }
+    .pricing-card {
+      cursor: pointer;
+      user-select: none;
+    }
+    .package-radio-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+    .radio-circle {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--gray-300);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+    .pricing-card.selected .radio-circle {
+      border-color: var(--gold);
+      background-color: var(--gold);
+    }
+    .pricing-card.selected .radio-circle::after {
+      content: '';
+      width: 8px;
+      height: 8px;
+      background-color: var(--white);
+      border-radius: 50%;
+    }
+    @media (max-width: 900px) {
+      .pricing-selector-grid {
+        grid-template-columns: 1fr;
+      }
+      .form-wrapper-card {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="Accueil ImmoData">
+        <img src="assets/logo.svg" alt="ImmoData Logo">
+      </a>
+
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="results.html" class="nav-link">Recherche</a>
+        <a href="expert.html" class="nav-link active">Avis d'Expert</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="results.html" class="btn btn-outline btn-sm">Retour aux données</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <div class="expert-hero">
+    <div class="container">
+      <span class="badge badge-gold" style="margin-bottom: 1rem;">Service d'évaluation certifié</span>
+      <h1>Demandez votre Avis d'Expert Immobilier</h1>
+      <p>
+        Remplissez le formulaire ci-dessous pour confier l'analyse de votre bien à nos évaluateurs agréés et recevoir votre rapport officiel certifié.
+      </p>
+    </div>
+  </div>
+
+  <!-- Form Main Container -->
+  <main class="container" style="padding-bottom: 5rem;">
+    <div class="form-wrapper-card">
+
+      <form id="expertForm" novalidate>
+        
+        <!-- SECTION 1: Localisation & Bien -->
+        <div class="form-section-title">
+          <span>📍</span> 1. Identification & Caractéristiques du Bien
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="propertyAddress">
+            Adresse complète du bien <span class="required">*</span>
+          </label>
+          <input 
+            type="text" 
+            id="propertyAddress" 
+            name="address" 
+            class="form-control" 
+            placeholder="Ex : 12 rue de la Paix, 75002 Paris" 
+            required
+          >
+          <div class="form-hint">Pré-remplie automatiquement d'après votre recherche précédente.</div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group">
+            <label class="form-label" for="propertyType">
+              Type de bien <span class="required">*</span>
+            </label>
+            <select id="propertyType" name="type" class="form-control" required>
+              <option value="Appartement" selected>Appartement</option>
+              <option value="Maison">Maison individuelle</option>
+              <option value="Terrain">Terrain à bâtir</option>
+              <option value="Local commercial">Local commercial / Bureau</option>
+              <option value="Immeuble">Immeuble de rapport</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="propertySurface">
+              Surface habitable (m²) <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="propertySurface" 
+              name="surface" 
+              class="form-control" 
+              placeholder="Ex : 68" 
+              min="5" 
+              max="5000" 
+              required
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="propertyRooms">
+              Nombre de pièces <span class="required">*</span>
+            </label>
+            <input 
+              type="number" 
+              id="propertyRooms" 
+              name="rooms" 
+              class="form-control" 
+              placeholder="Ex : 3" 
+              min="1" 
+              max="30" 
+              required
+            >
+          </div>
+        </div>
+
+        <div class="form-row-3">
+          <div class="form-group" id="floorGroup">
+            <label class="form-label" for="propertyFloor">
+              Étage (si appartement)
+            </label>
+            <input 
+              type="text" 
+              id="propertyFloor" 
+              name="floor" 
+              class="form-control" 
+              placeholder="Ex : 3ème avec ascenseur"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="propertyYear">
+              Année de construction
+            </label>
+            <input 
+              type="number" 
+              id="propertyYear" 
+              name="year" 
+              class="form-control" 
+              placeholder="Ex : 1985" 
+              min="1600" 
+              max="2026"
+            >
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="propertyCondition">
+              État général <span class="required">*</span>
+            </label>
+            <select id="propertyCondition" name="condition" class="form-control" required>
+              <option value="Très bon état">Très bon état / Neuf</option>
+              <option value="Bon état" selected>Bon état d'usage</option>
+              <option value="Moyen">Moyen (rafraîchissement)</option>
+              <option value="À rénover">À rénover entièrement</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="propertyWorks">
+              Montant estimé des travaux (€)
+            </label>
+            <input 
+              type="number" 
+              id="propertyWorks" 
+              name="works" 
+              class="form-control" 
+              placeholder="Ex : 15 000" 
+              min="0"
+            >
+            <div class="form-hint">Facultatif — Déduit ou valorisé dans l'évaluation d'expertise.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="propertyGoal">
+              Objectif de l'expertise <span class="required">*</span>
+            </label>
+            <select id="propertyGoal" name="goal" class="form-control" required>
+              <option value="Vente" selected>Projet de vente immobilière</option>
+              <option value="Achat">Offre d'achat / Négociation</option>
+              <option value="Succession">Succession / Donation</option>
+              <option value="Divorce">Partage / Divorce</option>
+              <option value="Fiscalité">Fiscalité / Déclaration IFI</option>
+              <option value="Autre">Autre projet patrimonial</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="propertyComments">
+            Particularités & Commentaires libres
+          </label>
+          <textarea 
+            id="propertyComments" 
+            name="comments" 
+            rows="3" 
+            class="form-control" 
+            placeholder="Ex : Balcon filant 8m², vue dégagée sur parc, cave saine en sous-sol, place de parking privative, ravalement voté..."
+          ></textarea>
+        </div>
+
+        <!-- SECTION 2: Choix de la formule d'expertise -->
+        <div class="form-section-title" style="margin-top: 2.5rem;">
+          <span>🎯</span> 2. Choisissez votre Formule d'Expertise
+        </div>
+
+        <div class="pricing-selector-grid" id="pricingCardsWrapper">
+          
+          <!-- Package 1: Économique -->
+          <div class="pricing-card" data-plan="economique" data-price="49" data-delay="7 jours">
+            <div class="pricing-header">
+              <div class="pricing-name">Économique</div>
+              <div class="pricing-time">Délai estimé : 7 jours</div>
+              <div class="pricing-price">
+                <span class="amount">49</span>
+                <span class="currency">€</span>
+              </div>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Rapport d'estimation standardisé</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Analyse comparative DVF du quartier</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Format PDF officiel téléchargeable</span>
+              </li>
+            </ul>
+            <div class="package-radio-indicator">
+              <span class="radio-circle"></span>
+              <span>Sélectionner 49€</span>
+            </div>
+          </div>
+
+          <!-- Package 2: Standard (POPULAIRE) -->
+          <div class="pricing-card popular selected" data-plan="standard" data-price="99" data-delay="3 jours">
+            <span class="popular-badge">⭐ Le Plus Populaire</span>
+            <div class="pricing-header">
+              <div class="pricing-name">Standard</div>
+              <div class="pricing-time">Délai estimé : 3 jours ouvrés</div>
+              <div class="pricing-price">
+                <span class="amount">99</span>
+                <span class="currency">€</span>
+              </div>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span><strong>Rapport complet certifié FNAIM</strong></span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Estimation DVF + Cadastre + DPE</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Analyse forces / faiblesses & valorisation</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Recommandations d'optimisation de vente</span>
+              </li>
+            </ul>
+            <div class="package-radio-indicator">
+              <span class="radio-circle"></span>
+              <span>Sélectionner 99€</span>
+            </div>
+          </div>
+
+          <!-- Package 3: Urgent -->
+          <div class="pricing-card" data-plan="urgent" data-price="199" data-delay="24h">
+            <div class="pricing-header">
+              <div class="pricing-name">Urgent Express</div>
+              <div class="pricing-time">Délai garanti : Moins de 24h</div>
+              <div class="pricing-price">
+                <span class="amount">199</span>
+                <span class="currency">€</span>
+              </div>
+            </div>
+            <ul class="pricing-features">
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span><strong>Rapport d'expertise premium sous 24h</strong></span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Visite virtuelle téléphonique dédiée (30 min)</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Rapport opposable juridiquement & fiscalement</span>
+              </li>
+              <li>
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                <span>Support prioritaire 7j/7</span>
+              </li>
+            </ul>
+            <div class="package-radio-indicator">
+              <span class="radio-circle"></span>
+              <span>Sélectionner 199€</span>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="selectedDelay">
+              Délai souhaité confirmé <span class="required">*</span>
+            </label>
+            <select id="selectedDelay" name="delay" class="form-control" required>
+              <option value="3 jours" selected>Standard — 3 jours ouvrés (99€)</option>
+              <option value="7 jours">Économique — 7 jours (49€)</option>
+              <option value="24h">Urgent — Moins de 24h (199€)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="clientEmail">
+              Votre adresse e-mail pour recevoir le rapport <span class="required">*</span>
+            </label>
+            <input 
+              type="email" 
+              id="clientEmail" 
+              name="email" 
+              class="form-control" 
+              placeholder="Ex : jean.dupont@email.fr" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- Submit and Guarantee Row -->
+        <div style="margin-top: 2.5rem; text-align: center;">
+          <button type="submit" class="btn btn-gold btn-lg" style="min-width: 320px; font-size: 1.15rem;">
+            <span>Passer à l'étape suivante : Paiement</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </button>
+          
+          <div style="margin-top: 1rem; font-size: 0.85rem; color: var(--gray-500); display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+            <span>🔒 Paiement sécurisé par Stripe</span>
+            <span>⭐ Satisfait ou remboursé</span>
+            <span>📄 Facture avec TVA française</span>
+          </div>
+        </div>
+
+      </form>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>
+          ImmoData © 2024 — Service d'expertise immobilière agréée en France.
+        </div>
+        <div>
+          <a href="index.html" style="color: #94A3B8;">Accueil</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Expert Form Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const queryAddress = urlParams.get('q') || urlParams.get('address') || localStorage.getItem('immo_last_query') || '';
+      
+      const addressInput = document.getElementById('propertyAddress');
+      if (addressInput && queryAddress) {
+        addressInput.value = queryAddress;
+      }
+
+      // Pre-select plan from URL if given
+      const urlPlan = (urlParams.get('plan') || '').toLowerCase();
+      let activePlan = urlPlan === 'urgent' ? 'urgent' : (urlPlan === 'economique' ? 'economique' : 'standard');
+      let activePrice = activePlan === 'urgent' ? 199 : (activePlan === 'economique' ? 49 : 99);
+      let activeDelay = activePlan === 'urgent' ? '24h' : (activePlan === 'economique' ? '7 jours' : '3 jours');
+
+      const pricingCards = document.querySelectorAll('.pricing-card');
+      const delaySelect = document.getElementById('selectedDelay');
+
+      function updateSelectedPlan(plan) {
+        activePlan = plan;
+        pricingCards.forEach(card => {
+          if (card.dataset.plan === plan) {
+            card.classList.add('selected');
+            activePrice = parseInt(card.dataset.price, 10);
+            activeDelay = card.dataset.delay;
+          } else {
+            card.classList.remove('selected');
+          }
+        });
+        if (delaySelect) {
+          delaySelect.value = activeDelay;
+        }
+      }
+
+      pricingCards.forEach(card => {
+        card.addEventListener('click', () => {
+          updateSelectedPlan(card.dataset.plan);
+        });
+      });
+
+      if (delaySelect) {
+        delaySelect.addEventListener('change', (e) => {
+          const val = e.target.value;
+          if (val === '24h') updateSelectedPlan('urgent');
+          else if (val === '7 jours') updateSelectedPlan('economique');
+          else updateSelectedPlan('standard');
+        });
+      }
+
+      // Initialize
+      updateSelectedPlan(activePlan);
+
+      // Handle form submission
+      const form = document.getElementById('expertForm');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const address = document.getElementById('propertyAddress').value.trim();
+        const type = document.getElementById('propertyType').value;
+        const surface = document.getElementById('propertySurface').value;
+        const rooms = document.getElementById('propertyRooms').value;
+        const floor = document.getElementById('propertyFloor').value;
+        const year = document.getElementById('propertyYear').value;
+        const condition = document.getElementById('propertyCondition').value;
+        const works = document.getElementById('propertyWorks').value;
+        const goal = document.getElementById('propertyGoal').value;
+        const email = document.getElementById('clientEmail').value.trim();
+        const comments = document.getElementById('propertyComments').value.trim();
+
+        if (!address) {
+          alert('Veuillez renseigner l\'adresse du bien.');
+          document.getElementById('propertyAddress').focus();
+          return;
+        }
+        if (!surface || surface <= 0) {
+          alert('Veuillez renseigner la surface habitable.');
+          document.getElementById('propertySurface').focus();
+          return;
+        }
+        if (!email || !email.includes('@')) {
+          alert('Veuillez renseigner une adresse email valide.');
+          document.getElementById('clientEmail').focus();
+          return;
+        }
+
+        // Save state to localStorage for PDF generation & continuity
+        const expertData = {
+          address,
+          type,
+          surface,
+          rooms,
+          floor,
+          year,
+          condition,
+          works,
+          goal,
+          email,
+          comments,
+          plan: activePlan,
+          amount: activePrice,
+          delay: activeDelay,
+          date: new Date().toLocaleDateString('fr-FR')
+        };
+        localStorage.setItem('immo_expert_data', JSON.stringify(expertData));
+
+        // Build redirect URL to payment.html
+        const payParams = new URLSearchParams({
+          plan: activePlan,
+          amount: activePrice,
+          delay: activeDelay,
+          address: address,
+          type: type,
+          surface: surface,
+          email: email
+        });
+
+        window.location.href = `payment.html?${payParams.toString()}`;
+      });
+    });
+  </script>
+</body>
+</html>

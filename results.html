@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Données Immobilières & DVF — ImmoData</title>
+  <meta name="description" content="Tableau de bord complet des données DVF, cadastre, DPE et marché pour votre adresse.">
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/results.css">
+</head>
+<body>
+
+  <!-- Site Navigation -->
+  <header class="site-header">
+    <div class="container">
+      <a href="index.html" class="brand-logo" aria-label="Accueil ImmoData">
+        <img src="assets/logo.svg" alt="ImmoData Logo">
+      </a>
+
+      <nav class="nav-menu">
+        <a href="index.html" class="nav-link">Accueil</a>
+        <a href="#localisation" class="nav-link">Localisation</a>
+        <a href="#dvf" class="nav-link">Transactions DVF</a>
+        <a href="#cadastre" class="nav-link">Cadastre</a>
+        <a href="#dpe" class="nav-link">DPE</a>
+        <a href="#indicateurs" class="nav-link">Indicateurs</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="expert.html" id="topbarExpertLink" class="btn btn-gold btn-sm">Avis d'expert</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky Results Top Bar with Search -->
+  <div class="results-topbar">
+    <div class="container">
+      <div class="topbar-search">
+        <form id="resultsSearchForm" class="search-box" autocomplete="off">
+          <input 
+            type="text" 
+            id="resultsAddressInput" 
+            class="search-input" 
+            placeholder="Changer d'adresse ou de commune..."
+            required
+          >
+          <button type="submit" class="search-submit-btn">
+            <span>Rechercher</span>
+          </button>
+        </form>
+        <div id="resultsAutocompleteDropdown" class="autocomplete-dropdown"></div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="query-summary-pill" id="querySummaryPill">
+          <span>🔍</span>
+          <strong id="summaryAddressLabel">Chargement...</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Main Layout -->
+  <main class="container">
+    <div class="dashboard-layout">
+      
+      <!-- Left Sidebar Navigation -->
+      <aside class="dashboard-sidebar">
+        <div class="sidebar-title">Navigation Rapide</div>
+        <nav class="sidebar-nav">
+          <a href="#localisation" class="sidebar-link active">
+            <span class="icon">📍</span>
+            <span>Localisation</span>
+          </a>
+          <a href="#dvf" class="sidebar-link">
+            <span class="icon">💰</span>
+            <span>Transactions DVF</span>
+          </a>
+          <a href="#cadastre" class="sidebar-link">
+            <span class="icon">🏡</span>
+            <span>Cadastre</span>
+          </a>
+          <a href="#dpe" class="sidebar-link">
+            <span class="icon">⚡</span>
+            <span>Performance (DPE)</span>
+          </a>
+          <a href="#commune" class="sidebar-link">
+            <span class="icon">🏙️</span>
+            <span>Données Commune</span>
+          </a>
+          <a href="#indicateurs" class="sidebar-link">
+            <span class="icon">📈</span>
+            <span>Indicateurs Marché</span>
+          </a>
+          <a href="#expert-cta" class="sidebar-link" style="color: #B45309;">
+            <span class="icon">🎯</span>
+            <span>Avis d'Expert</span>
+          </a>
+        </nav>
+
+        <div class="sidebar-cta-card">
+          <h4>Besoin d'un rapport certifié ?</h4>
+          <p>Obtenez une analyse immobilière complète sous 24h par un expert agréé.</p>
+          <a href="expert.html" id="sidebarExpertLink" class="btn btn-gold btn-sm" style="width: 100%;">
+            Dès 49€
+          </a>
+        </div>
+      </aside>
+
+      <!-- Main Dashboard Content -->
+      <div class="dashboard-main">
+
+        <!-- Top Overview Header Card -->
+        <div class="overview-hero-card">
+          <div class="overview-title-group">
+            <h1 id="heroAddressTitle">Analyse du Bien Immobilier</h1>
+            <div class="overview-address-sub">
+              <span id="heroAddressSubtitle">Recherche des coordonnées géographiques...</span>
+              <span class="overview-badge-tag" id="inseeBadge">INSEE: --</span>
+              <span class="overview-badge-tag" id="postcodeBadge">Code Postal: --</span>
+            </div>
+          </div>
+          <div>
+            <a href="expert.html" id="heroExpertCtaBtn" class="btn btn-white btn-sm">
+              <span>🎯 Demander une expertise</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- 1. LOCALISATION & MAP SECTION -->
+        <section class="dashboard-section" id="localisation">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>📍</span> 1. Localisation & Cartographie
+              </h2>
+              <span class="badge badge-blue">Source : Base Adresse Nationale (BAN)</span>
+            </div>
+            <div class="section-card-body">
+              <div class="map-container-wrapper">
+                <div id="map"></div>
+                <div class="location-info-panel">
+                  <div class="info-box">
+                    <div class="info-box-label">Adresse Reconnue</div>
+                    <div class="info-box-value" id="locFullAddress">--</div>
+                    <div class="info-box-sub" id="locCityContext">--</div>
+                  </div>
+                  <div class="info-box">
+                    <div class="info-box-label">Coordonnées GPS (WGS84)</div>
+                    <div class="info-box-value" id="locCoords">--</div>
+                    <div class="info-box-sub">Latitude / Longitude</div>
+                  </div>
+                  <div class="info-box">
+                    <div class="info-box-label">Rayon d'analyse DVF</div>
+                    <div class="info-box-value">500 mètres</div>
+                    <div class="info-box-sub">Périmètre autour du bien</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. TRANSACTIONS DVF SECTION -->
+        <section class="dashboard-section" id="dvf">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>💰</span> 2. Transactions DVF (Demandes de Valeurs Foncières)
+              </h2>
+              <span class="badge badge-blue">Ventes réelles enregistrées par l'État</span>
+            </div>
+            <div class="section-card-body">
+              
+              <!-- Stats Cards -->
+              <div class="stats-cards-grid">
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-blue">💶</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Prix Moyen / m²</div>
+                    <div class="stat-value" id="dvfAvgPriceM2">-- €/m²</div>
+                    <div class="stat-trend up" id="dvfAvgTrend">▲ Données calculées</div>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-gold">⚖️</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Prix Médian / m²</div>
+                    <div class="stat-value" id="dvfMedianPriceM2">-- €/m²</div>
+                    <div class="stat-trend neutral">Indicateur neutre</div>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-green">📝</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Transactions Analysées</div>
+                    <div class="stat-value" id="dvfCount">--</div>
+                    <div class="stat-trend neutral">Dans un rayon de 500m</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price Evolution Chart -->
+              <div class="chart-box" style="margin-bottom: 2rem;">
+                <div class="chart-title">
+                  <span>📈 Évolution du prix au m² dans le secteur (Historique des ventes DVF)</span>
+                  <span class="badge badge-gold">Prix réel net vendeur</span>
+                </div>
+                <div class="chart-canvas-wrapper">
+                  <canvas id="priceEvolutionChart"></canvas>
+                </div>
+              </div>
+
+              <!-- Sortable DVF Table -->
+              <div class="table-toolbar">
+                <div class="table-filter-tabs">
+                  <button class="filter-tab active" data-type="all">Tous les biens</button>
+                  <button class="filter-tab" data-type="Appartement">Appartements</button>
+                  <button class="filter-tab" data-type="Maison">Maisons</button>
+                  <button class="filter-tab" data-type="Terrain">Terrains / Autres</button>
+                </div>
+                <span class="badge badge-navy" id="tableRowsCount">20 résultats</span>
+              </div>
+
+              <div class="table-responsive">
+                <table class="data-table" id="dvfTable">
+                  <thead>
+                    <tr>
+                      <th class="sortable" data-sort="date">Date de mutation <span class="sort-icon">↕</span></th>
+                      <th class="sortable" data-sort="type">Type de bien <span class="sort-icon">↕</span></th>
+                      <th class="sortable" data-sort="surface">Surface réélle <span class="sort-icon">↕</span></th>
+                      <th class="sortable" data-sort="rooms">Pièces <span class="sort-icon">↕</span></th>
+                      <th class="sortable" data-sort="price">Prix total <span class="sort-icon">↕</span></th>
+                      <th class="sortable" data-sort="pricem2">Prix / m² <span class="sort-icon">↕</span></th>
+                      <th>Commune</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dvfTableBody">
+                    <tr>
+                      <td colspan="7" class="card-loader">
+                        <div class="spinner spinner-blue"></div>
+                        <span>Chargement des transactions DVF autour de l'adresse...</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. CADASTRE SECTION -->
+        <section class="dashboard-section" id="cadastre">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>🏡</span> 3. Données Cadastrales
+              </h2>
+              <span class="badge badge-warning">Source : IGN APICARTO Cadastre</span>
+            </div>
+            <div class="section-card-body">
+              <div id="cadastreLoading" class="card-loader">
+                <div class="spinner spinner-blue"></div>
+                <span>Interrogation des parcelles cadastrales IGN...</span>
+              </div>
+              <div class="cadastre-grid" id="cadastreContent" style="display: none;">
+                <div class="cadastre-card">
+                  <h4>Parcelle principale</h4>
+                  <ul>
+                    <li>Numéro parcelle : <strong id="cadastreNumero">0042</strong></li>
+                    <li>Section cadastrale : <strong id="cadastreSection">AB</strong></li>
+                    <li>Feuille : <strong id="cadastreFeuille">000 AB 01</strong></li>
+                  </ul>
+                </div>
+
+                <div class="cadastre-card">
+                  <h4>Contenance foncière</h4>
+                  <ul>
+                    <li>Surface cadastrale : <strong id="cadastreSurface">380 m²</strong></li>
+                    <li>Code commune INSEE : <strong id="cadastreInsee">--</strong></li>
+                    <li>Préfixe de section : <strong id="cadastrePrefixe">000</strong></li>
+                  </ul>
+                </div>
+
+                <div class="cadastre-card">
+                  <h4>Informations du plan</h4>
+                  <ul>
+                    <li>Système de projection : <strong>RGF93 / Lambert-93</strong></li>
+                    <li>Dernière mise à jour : <strong>Millésime officiel 2024</strong></li>
+                    <li>Gestionnaire : <strong>DGFIP / Cadastre IGN</strong></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 4. DPE (PERFORMANCE ÉNERGÉTIQUE) SECTION -->
+        <section class="dashboard-section" id="dpe">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>⚡</span> 4. Performance Énergétique (DPE)
+              </h2>
+              <span class="badge badge-blue">Source : ADEME (Base DPE Logements Existants)</span>
+            </div>
+            <div class="section-card-body">
+              <div class="dpe-overview-grid">
+                <!-- DPE Energy Scale -->
+                <div>
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem;">
+                    Répartition des classes énergétiques dans la commune
+                  </h4>
+                  <div class="dpe-scale-container" id="dpeBarsContainer">
+                    <!-- Populated by JS -->
+                  </div>
+                </div>
+
+                <!-- GES Scale and summary -->
+                <div>
+                  <h4 style="font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 1rem;">
+                    Conformité Climat & Résilience
+                  </h4>
+                  <div class="info-box" style="margin-bottom: 1rem;">
+                    <div class="info-box-label">Indice Moyen Secteur</div>
+                    <div class="info-box-value" style="display: flex; align-items: center; gap: 0.5rem;">
+                      <span class="badge-dpe badge-dpe-D">D</span>
+                      <span>195 kWh/m²/an</span>
+                    </div>
+                    <div class="info-box-sub">Classe moyenne constatée dans le secteur</div>
+                  </div>
+
+                  <div class="info-box">
+                    <div class="info-box-label">Réglementation Passoires Thermiques</div>
+                    <div style="font-size: 0.85rem; color: var(--gray-700); line-height: 1.5; margin-top: 0.25rem;">
+                      • Classes G : Interdiction de location progressive depuis 2023-2025<br>
+                      • Classes F : Interdiction de location à partir de 2028<br>
+                      • Audit énergétique obligatoire en cas de vente pour F et G.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Nearby DPE Table -->
+              <h4 style="font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: 0.75rem; margin-top: 1.5rem;">
+                Derniers diagnostics DPE répertoriés dans le secteur
+              </h4>
+              <div class="table-responsive">
+                <table class="data-table" id="dpeNearbyTable">
+                  <thead>
+                    <tr>
+                      <th>Date DPE</th>
+                      <th>Adresse / Secteur</th>
+                      <th>Surface</th>
+                      <th>Classe Énergie</th>
+                      <th>Classe Climat (GES)</th>
+                      <th>Type de Bâtiment</th>
+                    </tr>
+                  </thead>
+                  <tbody id="dpeTableBody">
+                    <tr>
+                      <td colspan="6" class="card-loader">
+                        <div class="spinner spinner-blue"></div>
+                        <span>Chargement des données ADEME DPE...</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. DONNÉES COMMUNE INSEE -->
+        <section class="dashboard-section" id="commune">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>🏙️</span> 5. Données de la Commune (INSEE)
+              </h2>
+              <span class="badge badge-navy">Source : API Découpage Administratif / INSEE</span>
+            </div>
+            <div class="section-card-body">
+              <div class="insee-stats-grid" id="inseeStatsGrid">
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-blue">👥</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Population Légale</div>
+                    <div class="stat-value" id="inseePopulation">-- hab.</div>
+                    <div class="stat-trend neutral">Recensement officiel</div>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-gold">🏛️</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Département</div>
+                    <div class="stat-value" id="inseeDepartement">--</div>
+                    <div class="stat-trend neutral" id="inseeDepCode">Code --</div>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-green">🗺️</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Région</div>
+                    <div class="stat-value" id="inseeRegion">--</div>
+                    <div class="stat-trend neutral">France métropolitaine</div>
+                  </div>
+                </div>
+
+                <div class="stat-card">
+                  <div class="stat-icon stat-icon-blue">📮</div>
+                  <div class="stat-content">
+                    <div class="stat-label">Codes Postaux</div>
+                    <div class="stat-value" id="inseeCodesPostaux">--</div>
+                    <div class="stat-trend neutral">Distributions postales</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. INDICATEURS DE MARCHÉ -->
+        <section class="dashboard-section" id="indicateurs">
+          <div class="section-card">
+            <div class="section-card-header">
+              <h2 class="section-card-title">
+                <span>📈</span> 6. Indicateurs de Marché & Typologie
+              </h2>
+              <span class="badge badge-blue">Statistiques agrégées</span>
+            </div>
+            <div class="section-card-body">
+              <div class="market-kpi-grid">
+                <div class="kpi-card">
+                  <div class="kpi-card-title">Évolution sur 1 an</div>
+                  <div class="kpi-card-val" id="kpiEvolution1an">+3.4 %</div>
+                  <div class="kpi-card-change" style="color: var(--success);">▲ Tendance haussière modérée</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-card-title">Évolution sur 2 ans</div>
+                  <div class="kpi-card-val" id="kpiEvolution2ans">+6.8 %</div>
+                  <div class="kpi-card-change" style="color: var(--success);">▲ Croissance soutenue</div>
+                </div>
+
+                <div class="kpi-card">
+                  <div class="kpi-card-title">Tension Immobilière</div>
+                  <div class="kpi-card-val">7.2 / 10</div>
+                  <div class="kpi-card-change" style="color: var(--warning);">Marché dynamique</div>
+                </div>
+              </div>
+
+              <!-- Market Charts (Pie Chart + Histogram) -->
+              <div class="charts-grid">
+                <div class="chart-box">
+                  <div class="chart-title">
+                    <span>Histogramme de distribution des surfaces (m²)</span>
+                  </div>
+                  <div class="chart-canvas-wrapper">
+                    <canvas id="surfaceHistogramChart"></canvas>
+                  </div>
+                </div>
+
+                <div class="chart-box">
+                  <div class="chart-title">
+                    <span>Types de biens vendus</span>
+                  </div>
+                  <div class="chart-canvas-wrapper">
+                    <canvas id="propertyTypePieChart"></canvas>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 7. EXPERT CTA BANNER -->
+        <section id="expert-cta">
+          <div class="expert-cta-banner">
+            <div class="cta-banner-text">
+              <h3>Vous souhaitez une analyse approfondie de ce bien ?</h3>
+              <p>
+                Confiez l'évaluation de votre bien à un expert immobilier agréé (FNAIM / RICS) : analyse comparative sur-mesure, calcul d'abattement travaux et rapport certifié délivré en PDF dès 49€.
+              </p>
+            </div>
+            <div class="cta-banner-action">
+              <a href="expert.html" id="bottomExpertCtaBtn" class="btn btn-gold btn-lg">
+                Demander un avis d'expert (dès 49€)
+              </a>
+            </div>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-bottom">
+        <div>
+          ImmoData © 2024 — Données issues des sources officielles françaises (DVF, ADEME, IGN, INSEE).
+        </div>
+        <div>
+          <a href="index.html" style="color: #94A3B8;">Nouvelle recherche</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Leaflet Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Scripts -->
+  <script src="js/main.js"></script>
+  <script src="js/results.js"></script>
+</body>
+</html>
